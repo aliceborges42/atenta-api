@@ -1,0 +1,2 @@
+class SecurityButton < ApplicationRecord
+end
