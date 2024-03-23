@@ -4,18 +4,20 @@ class ComplaintsController < ApplicationController
 
   # GET /complaints
   def index
-    @complaints = Complaint.all
-
-    render json: @complaints
+    @complaints = Complaint.all.includes(:type_specification, :complaint_type) # Isso irá pré-carregar os TypeSpecifications para evitar N+1 queries
+  
+    render json: @complaints.as_json(include: { type_specification: { only: [:id, :specification] }, complaint_type: { only: [:id, :classification]} })
   end
 
   # GET /complaints/1
   def show
-    render json: @complaint.as_json(include: :images).merge(
-      images: @complaint.images.map do |images|
-        url_for(image)
-      end
-    )
+    images_urls = @complaint.images.map do |image|
+      url_for(image)
+    end
+    render json: @complaint.as_json(include: {
+      complaint_type: { only: [:id, :classification]},
+      type_specification: { only: [:id, :specification] }
+    }).merge(images: images_urls)
   end
 
   # POST /complaints
