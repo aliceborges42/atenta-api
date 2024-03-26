@@ -52,6 +52,18 @@ class DeslikesController < ApplicationController
     @deslike.destroy!
   end
 
+  def deslikes_by_complaint
+    @deslikes = Deslike.where(complaint_id: params[:complaint_id])
+
+    render json: @deslikes
+  end
+
+  def deslikes_by_user
+    @deslikes = Deslike.where(user_id: current_user.id)
+
+    render json: @deslikes
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_deslike

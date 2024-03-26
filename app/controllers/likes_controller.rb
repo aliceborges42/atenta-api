@@ -52,6 +52,18 @@ class LikesController < ApplicationController
     @like.destroy!
   end
 
+  def likes_by_complaint
+    @likes = Like.where(complaint_id: params[:complaint_id])
+
+    render json: @likes
+  end
+
+  def likes_by_user
+    @likes = Like.where(user_id: current_user.id)
+
+    render json: @likes
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_like
