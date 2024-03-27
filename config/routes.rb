@@ -2,14 +2,15 @@ Rails.application.routes.draw do
   resources :security_buttons
   devise_for :users, controllers: {
     sessions: 'users/sessions',
-    registrations: 'users/registrations'
+    registrations: 'users/registrations',
+    # passwords: 'users/passwords'
   }
 
   get '/member_details' => 'members#index'
   put '/member_update' => 'members#update'
   patch '/member_update' => 'members#update'
 
-  put '/update_password' => 'passwords#update'
+  put '/update_password' => 'passwords_updates#update'
   
   post '/deslikes', to: 'deslikes#create', as: 'deslike'
   delete '/deslikes', to: 'deslikes#delete'
