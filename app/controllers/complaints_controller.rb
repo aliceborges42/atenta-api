@@ -11,13 +11,12 @@ class ComplaintsController < ApplicationController
 
   # GET /complaints/1
   def show
-    images_urls = @complaint.images.map do |image|
-      url_for(image)
-    end
+    images_data = @complaint.images.map { |image| { id: image.id, url: url_for(image) } }
+    
     render json: @complaint.as_json(include: {
-      complaint_type: { only: [:id, :classification]},
+      complaint_type: { only: [:id, :classification] },
       type_specification: { only: [:id, :specification] }
-    }).merge(images: images_urls)
+    }).merge(images: images_data)
   end
 
   # POST /complaints
@@ -65,13 +64,44 @@ class ComplaintsController < ApplicationController
   end
 
   # PATCH/PUT /complaints/1
+  # def update
+  #   if @complaint.update(complaint_params)
+  #     render json: @complaint
+  #   else
+  #     render json: @complaint.errors, status: :unprocessable_entity
+  #   end
+  # end
   def update
-    if @complaint.update(complaint_params)
-      render json: @complaint
+    if @complaint.user_id == current_user.id
+      if @complaint.update(complaint_params.except(:images, :removed_images_ids))
+        # Se os atributos da reclamação forem atualizados com sucesso, agora processe as imagens
+        images = params[:complaint][:images]
+        removed_images_ids = params[:complaint][:removed_images_ids]
+    
+        if images
+          # Se novas imagens forem enviadas, adicione-as à reclamação
+          images.each do |image|
+            @complaint.images.attach(image)
+          end
+        end
+    
+        if removed_images_ids
+          # Se IDs de imagens removidas forem enviados, remova-as da reclamação
+          removed_images_ids.each do |image_id|
+            image = @complaint.images.find_by(id: image_id)
+            image.purge if image
+          end
+        end
+    
+        render json: @complaint
+      else
+        render json: @complaint.errors, status: :unprocessable_entity
+      end
     else
-      render json: @complaint.errors, status: :unprocessable_entity
+      render json: { error: 'Unauthorized: You do not have permission to update this complaint' }, status: :unauthorized
     end
   end
+  
 
   # DELETE /complaints/1
   def destroy
@@ -92,6 +122,6 @@ class ComplaintsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def complaint_params
-      params.require(:complaint).permit(:id, :description, :status, :latitude, :longitude, :hour, :date, :complaint_type_id, :type_specification_id, images: [])
+      params.require(:complaint).permit(:id, :description, :status, :latitude, :longitude, :hour, :date, :complaint_type_id, :type_specification_id, images: [],  removed_images_ids: [])
     end
 end

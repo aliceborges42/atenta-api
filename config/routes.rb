@@ -6,6 +6,10 @@ Rails.application.routes.draw do
   }
 
   get '/member_details' => 'members#index'
+  put '/member_update' => 'members#update'
+  patch '/member_update' => 'members#update'
+
+  put '/update_password' => 'passwords#update'
   
   post '/deslikes', to: 'deslikes#create', as: 'deslike'
   delete '/deslikes', to: 'deslikes#delete'
@@ -14,6 +18,10 @@ Rails.application.routes.draw do
   delete '/likes', to: 'likes#delete'
   
   post '/complaints', to: 'complaints#create', as: 'complaint'
+
+  put '/compaints/:id', to: 'complaints#update'
+
+  patch '/compaints/:id', to: 'complaints#update'
 
   get 'complaints/:complaint_id/likes', to: 'likes#likes_by_complaint', as: 'likes_by_complaint'
 
