@@ -36,6 +36,8 @@ Rails.application.routes.draw do
 
   get '/deslikes/deslikes_by_user', to: 'deslikes#deslikes_by_user', as: 'deslikes_by_user'
   
+  delete '/member_destroy', to: 'members#destroy'
+
   # resources :complaints do
   #   collection do
   #     get 'search'

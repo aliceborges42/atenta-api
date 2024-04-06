@@ -79,6 +79,12 @@ class MembersController < ApplicationController
       render json: { error: ['Email ou código inválido.'] }, status: :not_found
     end
   end
+
+  def destroy
+    current_user.destroy
+    Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
+    head :no_content
+  end
 	
 	private
 	def user_params
