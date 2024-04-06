@@ -4,10 +4,22 @@ class ComplaintsController < ApplicationController
 
   # GET /complaints
   def index
-    @complaints = Complaint.all.includes(:type_specification, :complaint_type) # Isso irá pré-carregar os TypeSpecifications para evitar N+1 queries
+    # @complaints = Complaint.all.includes(:type_specification, :complaint_type) # Isso irá pré-carregar os TypeSpecifications para evitar N+1 queries
   
+    # render json: @complaints.as_json(include: { type_specification: { only: [:id, :specification] }, complaint_type: { only: [:id, :classification]} })
+    @q = Complaint.ransack(params[:q])
+    @complaints = @q.result.includes(:type_specification, :complaint_type)
+
     render json: @complaints.as_json(include: { type_specification: { only: [:id, :specification] }, complaint_type: { only: [:id, :classification]} })
   end
+
+  # GET /complaints/search
+  # def search
+  #   @q = Complaint.ransack(params[:q])
+  #   @complaints = @q.result.includes(:type_specification, :complaint_type)
+
+  #   render json: @complaints.as_json(include: { type_specification: { only: [:id, :specification] }, complaint_type: { only: [:id, :classification]} })
+  # end
 
   # GET /complaints/1
   def show
@@ -102,6 +114,12 @@ class ComplaintsController < ApplicationController
     end
   end
   
+  def member_complaints
+    # Filtra as reclamações pelo user_id do usuário logado
+    @complaints = Complaint.where(user_id: current_user.id).includes(:type_specification, :complaint_type)
+
+    render json: @complaints.as_json(include: { type_specification: { only: [:id, :specification] }, complaint_type: { only: [:id, :classification]} })
+  end
 
   # DELETE /complaints/1
   def destroy

@@ -9,6 +9,8 @@ Rails.application.routes.draw do
   get '/member_details' => 'members#index'
   put '/member_update' => 'members#update'
   patch '/member_update' => 'members#update'
+  post '/forgot', to: 'members#forgot'
+  post '/reset', to: 'members#reset'
 
   put '/update_password' => 'passwords_updates#update'
   
@@ -20,9 +22,11 @@ Rails.application.routes.draw do
   
   post '/complaints', to: 'complaints#create', as: 'complaint'
 
-  put '/compaints/:id', to: 'complaints#update'
+  put '/complaints/:id', to: 'complaints#update'
+  
+  get '/complaints/member_complaints', to: 'complaints#member_complaints'
 
-  patch '/compaints/:id', to: 'complaints#update'
+  patch '/complaints/:id', to: 'complaints#update'
 
   get 'complaints/:complaint_id/likes', to: 'likes#likes_by_complaint', as: 'likes_by_complaint'
 
@@ -32,6 +36,11 @@ Rails.application.routes.draw do
 
   get '/deslikes/deslikes_by_user', to: 'deslikes#deslikes_by_user', as: 'deslikes_by_user'
   
+  # resources :complaints do
+  #   collection do
+  #     get 'search'
+  #   end
+  # end
   resources :deslikes
   resources :likes
   resources :type_specifications
