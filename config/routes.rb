@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :privacy_policies
+  resources :term_of_uses
   resources :security_buttons
   devise_for :users, controllers: {
     sessions: 'users/sessions',
@@ -38,12 +40,17 @@ Rails.application.routes.draw do
   
   delete '/member_destroy', to: 'members#destroy'
 
+  # get '/terms_of_use', to: 'terms_of_uses#show'
+  # get '/privacy_policy', to: 'privacy_policies#show'
+
   # resources :complaints do
   #   collection do
   #     get 'search'
   #   end
   # end
   resources :deslikes
+  resources :privacy_policies
+  resources :terms_of_uses
   resources :likes
   resources :type_specifications
   resources :complaint_types

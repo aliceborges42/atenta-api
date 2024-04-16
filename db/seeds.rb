@@ -1,6 +1,9 @@
 ComplaintType.destroy_all
 TypeSpecification.destroy_all
 SecurityButton.destroy_all
+TermOfUse.destroy_all
+PrivacyPolicy.destroy_all
+
 
 ComplaintType.create!([{
     classification: "Desordem"
@@ -222,3 +225,93 @@ SecurityButton.create!([{
 ])
 
 p "Created #{SecurityButton.count} Security Buttons"
+
+PrivacyPolicy.create(content: <<-CONTENT.strip_heredoc
+  **POLÍTICA DE PRIVACIDADE DO ATENTA UNB**
+
+  Última atualização: 16/04/2024
+
+  O Atenta UnB está comprometido em proteger a sua privacidade. Esta Política de Privacidade descreve como coletamos, usamos e compartilhamos suas informações pessoais quando você utiliza nosso aplicativo.
+
+  **Informações que Coletamos:**
+
+  Ao usar o Atenta UnB, podemos coletar as seguintes informações pessoais:
+
+  - Nome completo
+  - Endereço de e-mail
+  - CPF (Cadastro de Pessoas Físicas)
+
+  **Como Usamos Suas Informações:**
+
+  As informações que coletamos são utilizadas para os seguintes propósitos:
+
+  - Criar e gerenciar sua conta no aplicativo.
+  - Fornecer suporte ao usuário e responder a consultas.
+  - Enviar comunicações relacionadas ao serviço, como atualizações e notificações.
+  - Melhorar e personalizar a experiência do usuário.
+
+  **Compartilhamento de Informações:**
+
+  Não compartilhamos suas informações pessoais com terceiros, exceto nas seguintes circunstâncias:
+
+  - Quando necessário para cumprir com a legislação aplicável.
+  - Com seu consentimento explícito.
+  - Para proteger os direitos, propriedade ou segurança do Atenta UnB, de nossos usuários ou do público.
+
+  **Segurança das Informações:**
+
+  Empregamos medidas de segurança para proteger suas informações contra acesso não autorizado, alteração, divulgação ou destruição.
+
+  **Seus Direitos:**
+
+  Você tem o direito de acessar, corrigir, atualizar ou excluir suas informações pessoais a qualquer momento. Para exercer esses direitos, entre em contato conosco através dos dados fornecidos abaixo.
+
+  **Alterações nesta Política:**
+
+  Esta Política de Privacidade pode ser atualizada periodicamente. Recomendamos que você reveja esta página regularmente para estar ciente de quaisquer alterações. A data de atualização será indicada na parte superior desta página.
+
+  **Contato:**
+
+  Se você tiver dúvidas ou preocupações sobre esta Política de Privacidade, entre em contato conosco pelo e-mail: atentaapp@gmail.com.
+
+  Ao utilizar o Atenta UnB, você concorda com a coleta e uso de suas informações pessoais conforme descrito nesta Política de Privacidade.
+CONTENT
+)
+
+
+TermOfUse.create(content: <<-CONTENT.strip_heredoc
+    **TERMOS DE USO DO ATENTA UNB**
+  
+    Ao utilizar o aplicativo Atenta UnB, você concorda com os seguintes termos:
+  
+    **Elegibilidade:**
+  
+    Você declara e garante que é uma mulher para poder utilizar o aplicativo Atenta UnB.
+  
+    **Denúncias Falsas:**
+  
+    Você concorda em não fazer denúncias falsas ou enganosas por meio do aplicativo Atenta UnB. Denúncias infundadas podem resultar na suspensão ou encerramento da sua conta.
+  
+    **Propriedade dos Dados:**
+  
+    Você concorda em fornecer apenas informações que pertençam a você e em não utilizar dados de terceiros sem permissão.
+  
+    **Responsabilidade do Usuário:**
+  
+    Você é responsável por todas as atividades realizadas em sua conta e concorda em manter suas informações de login seguras e confidenciais.
+  
+    **Uso Adequado:**
+  
+    Você concorda em usar o aplicativo Atenta UnB de acordo com as leis aplicáveis e em respeitar os direitos de privacidade e propriedade intelectual de terceiros.
+  
+    **Alterações nos Termos de Uso:**
+  
+    Reservamo-nos o direito de modificar estes Termos de Uso a qualquer momento, mediante aviso prévio. O uso continuado do aplicativo após tais alterações constitui sua concordância com os novos termos.
+  
+    **Encerramento da Conta:**
+  
+    Reservamo-nos o direito de encerrar ou suspender sua conta, a nosso critério, por violação destes Termos de Uso ou por qualquer atividade considerada prejudicial ao aplicativo ou aos outros usuários.
+  
+    Ao utilizar o aplicativo Atenta UnB, você concorda em cumprir estes Termos de Uso. Se você não concorda com estes termos, por favor, não use o aplicativo.
+  CONTENT
+  )
