@@ -58,17 +58,14 @@ TypeSpecification.create!([{
 {
     specification: "Via pública com lixo, entulho "
 },
-{
-    specification: "Cheiros desagradáveis"
-},
+# {
+#     specification: "Cheiros desagradáveis"
+# },
 {
     specification: "Muros pichados"
 },
 {
     specification: "Poste de luz danificado"
-},
-{
-    specification: "Carros abandonados e carcaças"
 },
 {
     specification: "Terreno com mato alto; sem poda"
@@ -79,18 +76,18 @@ TypeSpecification.create!([{
 {
     specification: "Lixeiras quebradas"
 },
-{
-    specification: "Esgoto a céu aberto"
-},
-{
-    specification: "Infestação de parasitas"
-},
-{
-    specification: "Coleta de lixo irregular"
-},
-{
-    specification: "Lixo queimado irregularmente"
-},
+# {
+#     specification: "Esgoto a céu aberto"
+# },
+# {
+#     specification: "Infestação de parasitas"
+# },
+# {
+#     specification: "Coleta de lixo irregular"
+# },
+# {
+#     specification: "Lixo queimado irregularmente"
+# },
 {
     specification: "Paradas de ônibus sujas"
 },
@@ -121,9 +118,9 @@ TypeSpecification.create!([{
 {
     specification: "Ruídos, música alta e gritaria"
 },
-{
-    specification: "Vendedores ambulantes/camelôs"
-},
+# {
+#     specification: "Vendedores ambulantes/camelôs"
+# },
 {
     specification: "Flanelinhas"
 },
@@ -157,9 +154,9 @@ TypeSpecification.create!([{
 {
     specification: "Tráfico"
 }, 
-{
-    specification: "Lixo queimado irregularmente"
-}, 
+# {
+#     specification: "Lixo queimado irregularmente"
+# }, 
 {
     specification: "Ato obsceno em local público"
 },   
