@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_13_205755) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_14_212945) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "postgis"
@@ -61,6 +61,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_13_205755) do
     t.bigint "complaint_type_id", null: false
     t.bigint "type_specification_id", null: false
     t.bigint "user_id", null: false
+    t.date "resolution_date"
     t.index ["complaint_type_id"], name: "index_complaints_on_complaint_type_id"
     t.index ["type_specification_id"], name: "index_complaints_on_type_specification_id"
     t.index ["user_id"], name: "index_complaints_on_user_id"

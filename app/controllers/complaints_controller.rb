@@ -1,5 +1,5 @@
 class ComplaintsController < ApplicationController
-  before_action :authenticate_user!, except: %i[ show index common_incidents_in_area resolution_rate number_of_complaints_by_month resolution_rate_by_month]
+  before_action :authenticate_user!, except: %i[ show index common_incidents_in_area resolution_rate number_of_complaints_by_month resolved_complaints_by_month]
   before_action :set_complaint, only: %i[ show update destroy ]
 
   # GET /complaints
@@ -85,26 +85,33 @@ class ComplaintsController < ApplicationController
   # end
   def update
     if @complaint.user_id == current_user.id
+      old_status = @complaint.status
       if @complaint.update(complaint_params.except(:images, :removed_images_ids))
-        # Se os atributos da reclamação forem atualizados com sucesso, agora processe as imagens
+        # Verifica se o status foi alterado para "Resolvido" e se o resolution_date ainda não foi definido
+        if old_status != "Resolvido" && @complaint.status == "Resolvido" && @complaint.resolution_date.nil?
+          @complaint.update(resolution_date: Date.today)
+          print("entrouiiii")
+        end
+  
+        # Processa as imagens
         images = params[:complaint][:images]
         removed_images_ids = params[:complaint][:removed_images_ids]
-    
+  
         if images
-          # Se novas imagens forem enviadas, adicione-as à reclamação
+          # Adiciona novas imagens à reclamação
           images.each do |image|
             @complaint.images.attach(image)
           end
         end
-    
+  
         if removed_images_ids
-          # Se IDs de imagens removidas forem enviados, remova-as da reclamação
+          # Remove imagens da reclamação
           removed_images_ids.each do |image_id|
             image = @complaint.images.find_by(id: image_id)
             image.purge if image
           end
         end
-    
+  
         render json: @complaint
       else
         render json: @complaint.errors, status: :unprocessable_entity
@@ -113,6 +120,7 @@ class ComplaintsController < ApplicationController
       render json: { error: 'Unauthorized: You do not have permission to update this complaint' }, status: :unauthorized
     end
   end
+  
   
   def member_complaints
     # Filtra as reclamações pelo user_id do usuário logado
@@ -199,37 +207,26 @@ class ComplaintsController < ApplicationController
     render json: { resolution_rate: resolution_rate }
   end
 
-  def resolution_rate_by_month
+  def resolved_complaints_by_month
     # Filtragem por ano, complaint type e type specification
     year = params[:year] if params[:year].present?
     complaint_type_id = params[:complaint_type_id] if params[:complaint_type_id].present?
     type_specification_id = params[:type_specification_id] if params[:type_specification_id].present?
-
+  
     # Filtros opcionais
     complaints = Complaint.all
-    complaints = complaints.where(date: Date.parse("#{year}-01-01")..Date.parse("#{year}-12-31")) if year.present?
+    complaints = complaints.where(resolution_date: Date.parse("#{year}-01-01")..Date.parse("#{year}-12-31")) if year.present?
     complaints = complaints.where(complaint_type_id: complaint_type_id) if complaint_type_id.present?
     complaints = complaints.where(type_specification_id: type_specification_id) if type_specification_id.present?
-
+  
     # Contagem de denúncias resolvidas por mês do ano
     resolved_complaints_by_month = complaints.where(status: 'Resolvido')
-                                             .group_by { |complaint| complaint.date.strftime('%Y-%m') }
+                                             .group_by { |complaint| complaint.resolution_date.strftime('%Y-%m') }
                                              .transform_values(&:count)
-
-    # Contagem total de denúncias por mês do ano
-    total_complaints_by_month = complaints.group_by { |complaint| complaint.date.strftime('%Y-%m') }
-                                          .transform_values(&:count)
-
-    # Calculando a taxa de resolução para cada mês
-    resolution_rate_by_month = {}
-    resolved_complaints_by_month.each do |month, resolved_count|
-      total_count = total_complaints_by_month[month] || 0
-      resolution_rate = total_count.positive? ? (resolved_count.to_f / total_count * 100).round(2) : 0
-      resolution_rate_by_month[month] = resolution_rate
-    end
-
-    render json: resolution_rate_by_month
+  
+    render json: resolved_complaints_by_month
   end
+  
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -239,6 +236,6 @@ class ComplaintsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def complaint_params
-      params.require(:complaint).permit(:id, :description, :status, :latitude, :longitude, :hour, :date, :complaint_type_id, :type_specification_id, images: [],  removed_images_ids: [])
+      params.require(:complaint).permit(:id, :description, :status, :latitude, :longitude, :hour, :date, :complaint_type_id, :type_specification_id, images: [],  removed_images_ids: [],)
     end
 end
