@@ -44,7 +44,7 @@ Rails.application.routes.draw do
   get '/complaints/common_incidents_in_area', to: 'complaints#common_incidents_in_area'
   get '/complaints/number_of_complaints_by_month', to: 'complaints#number_of_complaints_by_month'
   get '/complaints/resolution_rate', to: 'complaints#resolution_rate'
-  get '/complaints/resolution_rate_by_month', to: 'complaints#resolution_rate_by_month'
+  get '/complaints/resolved_complaints_by_month', to: 'complaints#resolved_complaints_by_month'
   
   # get '/terms_of_use', to: 'terms_of_uses#show'
   # get '/privacy_policy', to: 'privacy_policies#show'
