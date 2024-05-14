@@ -1,5 +1,5 @@
 class ComplaintsController < ApplicationController
-  before_action :authenticate_user!, except: %i[ show index ]
+  before_action :authenticate_user!, except: %i[ show index common_incidents_in_area resolution_rate number_of_complaints_by_month resolution_rate_by_month]
   before_action :set_complaint, only: %i[ show update destroy ]
 
   # GET /complaints
@@ -130,6 +130,105 @@ class ComplaintsController < ApplicationController
     @image = ActiveStorage::Attachment.find(params[:id])
     @image.purge_later
     redirect_back(fallback_location: request.referer)
+  end
+  
+  # GET /complaints/common_incidents_in_area
+  def common_incidents_in_area
+    radius = 200 # Definindo o raio como 600 metros
+    type_specification_id = params[:type_specification_id] # Recebendo o parâmetro type_specification_id
+    complaints = Complaint.all
+
+    # Inicializando um conjunto para armazenar os grupos de denúncias com o mesmo tipo de especificação
+    common_groups = Set.new
+
+    # Percorrendo todas as denúncias
+    complaints.each_with_index do |complaint, index|
+      # Verificando se esta denúncia já foi incluída em algum grupo existente
+      next if common_groups.any? { |group| group.include?(complaint) }
+
+      # Consultando denúncias do mesmo tipo de especificação e próximas
+      nearby_complaints = Complaint.where("ST_DWithin(ST_MakePoint(?, ?)::geography, ST_MakePoint(complaints.longitude, complaints.latitude)::geography, ?) AND type_specification_id = ?", complaint.longitude, complaint.latitude, radius, type_specification_id)
+    
+      # Verificando se há mais de uma denúncia no grupo
+      if nearby_complaints.length > 1
+        # Adicionando ao conjunto se houver mais de uma denúncia
+        common_groups << nearby_complaints
+      end
+    end
+
+    render json: common_groups.as_json
+  end
+
+  def number_of_complaints_by_month
+    # Filtragem por ano, complaint type e type specification
+    year = params[:year] if params[:year].present?
+    complaint_type_id = params[:complaint_type_id] if params[:complaint_type_id].present?
+    type_specification_id = params[:type_specification_id] if params[:type_specification_id].present?
+
+    # Filtros opcionais
+    complaints = Complaint.all
+    complaints = complaints.where(date: Date.parse("#{year}-01-01")..Date.parse("#{year}-12-31")) if year.present?
+    complaints = complaints.where(complaint_type_id: complaint_type_id) if complaint_type_id.present?
+    complaints = complaints.where(type_specification_id: type_specification_id) if type_specification_id.present?
+
+    # Contagem de denúncias por mês do ano
+    complaints_by_month = complaints.group_by { |complaint| complaint.date.strftime('%Y-%m') }
+                                    .transform_values(&:count)
+    
+    render json: complaints_by_month
+  end
+
+  # GET /complaints/resolution_rate
+  def resolution_rate
+    # Filtragem por ano, complaint type e type specification
+    year = params[:year] if params[:year].present?
+    complaint_type_id = params[:complaint_type_id] if params[:complaint_type_id].present?
+    type_specification_id = params[:type_specification_id] if params[:type_specification_id].present?
+
+    # Filtros opcionais
+    complaints = Complaint.all
+    complaints = complaints.where(date: Date.parse("#{year}-01-01")..Date.parse("#{year}-12-31")) if year.present?
+    complaints = complaints.where(complaint_type_id: complaint_type_id) if complaint_type_id.present?
+    complaints = complaints.where(type_specification_id: type_specification_id) if type_specification_id.present?
+
+    # Taxa de resolução de denúncias
+    total_complaints = complaints.count
+    resolved_complaints = complaints.where(status: 'Resolvido').count
+    resolution_rate = (resolved_complaints.to_f / total_complaints * 100).round(2)
+    
+    render json: { resolution_rate: resolution_rate }
+  end
+
+  def resolution_rate_by_month
+    # Filtragem por ano, complaint type e type specification
+    year = params[:year] if params[:year].present?
+    complaint_type_id = params[:complaint_type_id] if params[:complaint_type_id].present?
+    type_specification_id = params[:type_specification_id] if params[:type_specification_id].present?
+
+    # Filtros opcionais
+    complaints = Complaint.all
+    complaints = complaints.where(date: Date.parse("#{year}-01-01")..Date.parse("#{year}-12-31")) if year.present?
+    complaints = complaints.where(complaint_type_id: complaint_type_id) if complaint_type_id.present?
+    complaints = complaints.where(type_specification_id: type_specification_id) if type_specification_id.present?
+
+    # Contagem de denúncias resolvidas por mês do ano
+    resolved_complaints_by_month = complaints.where(status: 'Resolvido')
+                                             .group_by { |complaint| complaint.date.strftime('%Y-%m') }
+                                             .transform_values(&:count)
+
+    # Contagem total de denúncias por mês do ano
+    total_complaints_by_month = complaints.group_by { |complaint| complaint.date.strftime('%Y-%m') }
+                                          .transform_values(&:count)
+
+    # Calculando a taxa de resolução para cada mês
+    resolution_rate_by_month = {}
+    resolved_complaints_by_month.each do |month, resolved_count|
+      total_count = total_complaints_by_month[month] || 0
+      resolution_rate = total_count.positive? ? (resolved_count.to_f / total_count * 100).round(2) : 0
+      resolution_rate_by_month[month] = resolution_rate
+    end
+
+    render json: resolution_rate_by_month
   end
 
   private
