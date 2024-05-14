@@ -40,6 +40,12 @@ Rails.application.routes.draw do
   
   delete '/member_destroy', to: 'members#destroy'
 
+  # get '/complaints/density_by_area', to: 'complaints#density_by_area'
+  get '/complaints/common_incidents_in_area', to: 'complaints#common_incidents_in_area'
+  get '/complaints/number_of_complaints_by_month', to: 'complaints#number_of_complaints_by_month'
+  get '/complaints/resolution_rate', to: 'complaints#resolution_rate'
+  get '/complaints/resolution_rate_by_month', to: 'complaints#resolution_rate_by_month'
+  
   # get '/terms_of_use', to: 'terms_of_uses#show'
   # get '/privacy_policy', to: 'privacy_policies#show'
 
